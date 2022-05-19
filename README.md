@@ -1,2 +1,2 @@
 # full-stack-open
-Full Stack Open 2022 coursework
+Full Stack Open 2022 exercises
