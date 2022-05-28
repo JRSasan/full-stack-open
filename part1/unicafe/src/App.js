@@ -6,35 +6,10 @@ const Button = ({ handleClick, text }) => (
   </button>
 )
 
-const Statistics = ({ feedback, text }) => {
-  console.log(feedback, text)
-  return (
-    <div>
-      {text} {feedback}
-    </div>
-  )
-}
+const Statistics = ({ feedback }) => {
+  console.log("feedback", feedback)
 
-
-
-const App = () => {
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
-  const [allfeedback, setAll] = useState(0)
-
-  const handleGoodClick = () => {
-    setGood(good+1)
-    setAll(allfeedback+1)
-  }
-  const handleNeutralClick = () => {
-    setNeutral(neutral+1)
-    setAll(allfeedback+1)
-  }
-  const handleBadClick = () => {
-    setBad(bad+1)
-    setAll(allfeedback+1)
-  }
+  const [good, neutral, bad, allfeedback] = feedback
 
   const averageFeedback = () => {
     let average
@@ -58,6 +33,58 @@ const App = () => {
     return percentage + ' %'
   }
 
+  if (allfeedback === 0) {
+    return (
+      <div>
+        No feedback given
+      </div>
+    )
+  }
+
+  return (
+    <table>
+      <StatisticLine text="good" value={good} />
+      <StatisticLine text="neutral" value={neutral} />
+      <StatisticLine text="bad" value={bad} />
+      <StatisticLine text="all" value={allfeedback} />
+      <StatisticLine text="average" value={averageFeedback()} />
+      <StatisticLine text="positive" value={positivePercent()} />
+    </table>      
+  )
+}
+
+const StatisticLine = ( { text, value }) => (
+  <tbody>
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
+  </tbody>
+)
+
+
+
+const App = () => {
+  const [good, setGood] = useState(0)
+  const [neutral, setNeutral] = useState(0)
+  const [bad, setBad] = useState(0)
+  const [allfeedback, setAll] = useState(0)
+
+  const feedback = [good, neutral, bad, allfeedback]
+
+  const handleGoodClick = () => {
+    setGood(good+1)
+    setAll(allfeedback+1)
+  }
+  const handleNeutralClick = () => {
+    setNeutral(neutral+1)
+    setAll(allfeedback+1)
+  }
+  const handleBadClick = () => {
+    setBad(bad+1)
+    setAll(allfeedback+1)
+  }
+
   return (
     <div>
     <h1>give feedback</h1>
@@ -65,12 +92,7 @@ const App = () => {
     <Button handleClick={handleNeutralClick} text='neutral' />
     <Button handleClick={handleBadClick} text='bad' />
     <h1>statistics</h1>
-    <Statistics feedback={good} text='good' />
-    <Statistics feedback={neutral} text='neutral' />
-    <Statistics feedback={bad} text='bad' />
-    <Statistics feedback={allfeedback} text='all' />
-    <Statistics feedback={averageFeedback()} text='average' />
-    <Statistics feedback={positivePercent()} text='positive' />
+    <Statistics feedback={feedback}/>
     </div>
   )
 }
