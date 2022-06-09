@@ -27,7 +27,6 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      id: persons.length+1
     }
 
     if(doesNameExist() === false) {
@@ -42,6 +41,17 @@ const App = () => {
       alert(`${newName} is already added to the phonebook`)
     }  
   }
+
+  const removePerson = (name, id) => {
+    if(window.confirm(`Delete ${name} ?`)) {
+      personService
+        .deletePerson(id)
+        .then(()=> {
+          window.location.reload(false)
+        })
+    }
+  }
+
   console.log("Phonebook: ", persons)
 
   const handleNameChange = (event) => {
@@ -62,12 +72,16 @@ const App = () => {
       <Filter filters={filters} handleFilters={handleFilters} />
       <h2>Add a new</h2>
       <PersonForm 
-      addPerson={addPerson} 
-      handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} 
-      newName={newName} newNumber={newNumber} 
+        addPerson={addPerson} 
+        handleNameChange={handleNameChange} 
+        handleNumberChange={handleNumberChange} 
+        newName={newName} newNumber={newNumber} 
       />
       <h2>Numbers</h2>
-      <Persons persons={persons} filters={filters} />
+      <Persons 
+        persons={persons} 
+        filters={filters} 
+        removePerson={removePerson} />
     </div>
   )
 }
