@@ -38,28 +38,30 @@ const App = () => {
       })
   }
 
-  const updatePerson = () => {
+  const updatePerson = (event) => {
+    event.preventDefault()
     const person = persons.find(p => p.name.toLowerCase() === newName.toLocaleLowerCase())
     const changedPerson = {...person, number: newNumber}
 
     if(newNumber === '') {
       alert(`${newName} is already added to the phonebook`)
-      setNewName(newName)
     } else if(window.confirm(`${newName} is already added to the phonebook, replace the old number with a new one?`)) {
         personService
         .update(changedPerson.id, changedPerson)
         .then(returnedPerson => {
           setPersons(persons.map(person => person.id !== changedPerson.id ? person : returnedPerson))
+          setNewName('')
+          setNewNumber('')
         })
       }
   }
 
   const removePerson = (name, id) => {
-    if(window.confirm(`Delete ${name} ?`)) {
+    if(window.confirm(`Delete ${name}?`)) {
       personService
         .deletePerson(id)
         .then(()=> {
-          window.location.reload(false)
+          setPersons(persons.filter(p => p.id !== id))
         })
     }
   }
