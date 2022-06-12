@@ -4,11 +4,34 @@ import PersonForm from './PersonForm'
 import Persons from './Persons'
 import Filter from './Filter'
 
+const Notification = ({message}) => {
+  const notifStyle = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+
+  if(message === null) {
+    return null
+  }
+
+  return (
+    <div style = {notifStyle}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filters, setNewFilters] = useState('')
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -33,6 +56,10 @@ const App = () => {
       .create(personObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        setMessage(`Added ${personObject.name}`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
         setNewName('')
         setNewNumber('')
       })
@@ -50,6 +77,10 @@ const App = () => {
         .update(changedPerson.id, changedPerson)
         .then(returnedPerson => {
           setPersons(persons.map(person => person.id !== changedPerson.id ? person : returnedPerson))
+          setMessage(`Updated ${person.name}'s number`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
           setNewName('')
           setNewNumber('')
         })
@@ -62,6 +93,10 @@ const App = () => {
         .deletePerson(id)
         .then(()=> {
           setPersons(persons.filter(p => p.id !== id))
+          setMessage(`Deleted ${name}`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
         })
     }
   }
@@ -85,6 +120,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter filters={filters} handleFilters={handleFilters} />
       <h2>Add a new</h2>
       <PersonForm 
