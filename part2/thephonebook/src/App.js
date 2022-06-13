@@ -4,7 +4,7 @@ import PersonForm from './PersonForm'
 import Persons from './Persons'
 import Filter from './Filter'
 
-const Notification = ({message}) => {
+const Notification = ({message, isError}) => {
   const notifStyle = {
     color: 'green',
     background: 'lightgrey',
@@ -17,13 +17,24 @@ const Notification = ({message}) => {
 
   if(message === null) {
     return null
-  }
+  } else if(isError) {
+    const errorStyle = {
+      ...notifStyle,
+      color: 'red'
+    }
 
-  return (
-    <div style = {notifStyle}>
+    return (
+    <div style = {errorStyle}>
       {message}
     </div>
-  )
+    )
+  } else {
+    return (
+      <div style = {notifStyle}>
+        {message}
+      </div>
+    )
+  }
 }
 
 const App = () => {
@@ -32,6 +43,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filters, setNewFilters] = useState('')
   const [message, setMessage] = useState(null)
+  const [isError, setIsError] = useState(false)
 
   useEffect(() => {
     personService
@@ -84,6 +96,14 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(error => {
+          setMessage(`Information of ${person.name} has already been removed from the server`)
+          setIsError(true)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+          setPersons(persons.filter(p => p.id !== person.id))
+        })
       }
   }
 
@@ -120,7 +140,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} isError={isError} />
       <Filter filters={filters} handleFilters={handleFilters} />
       <h2>Add a new</h2>
       <PersonForm 
