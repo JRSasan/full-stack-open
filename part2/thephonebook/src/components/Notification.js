@@ -1,5 +1,5 @@
 const Notification = ({notification}) => {
-    if(message === null) {
+    if(notification === null) {
         return null
     } 
 
@@ -14,8 +14,10 @@ const Notification = ({notification}) => {
     }
   
     return (
-        <div style={style}>
+        <div style={notifStyle}>
             {notification.message}
         </div>
     )
   }
+
+  export default Notification
