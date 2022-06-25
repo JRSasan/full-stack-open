@@ -1,59 +1,31 @@
 import { useEffect, useState } from 'react'
 import personService from './services/persons'
-import PersonForm from './PersonForm'
-import Persons from './Persons'
-import Filter from './Filter'
-
-const Notification = ({message, isError}) => {
-  const notifStyle = {
-    color: 'green',
-    background: 'lightgrey',
-    fontSize: 20,
-    borderStyle: 'solid',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10
-  }
-
-  if(message === null) {
-    return null
-  } else if(isError) {
-    const errorStyle = {
-      ...notifStyle,
-      color: 'red'
-    }
-
-    return (
-    <div style = {errorStyle}>
-      {message}
-    </div>
-    )
-  } else {
-    return (
-      <div style = {notifStyle}>
-        {message}
-      </div>
-    )
-  }
-}
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
+import Filter from './components/Filter'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filters, setNewFilters] = useState('')
-  const [message, setMessage] = useState(null)
-  const [isError, setIsError] = useState(false)
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     personService
       .getAll()
       .then(initialPersons => {
-        console.log('promise fulfilled')
         setPersons(initialPersons)
       })
   }, [])
-  console.log('render', persons.length, 'persons')
+
+  const notify = (message, type='info') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 3000)
+  }
 
   const doesNameExist = () => persons.some(person => person.name.toLowerCase() === newName.toLowerCase())
 
@@ -68,10 +40,7 @@ const App = () => {
       .create(personObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
-        setMessage(`Added ${personObject.name}`)
-        setTimeout(() => {
-          setMessage(null)
-        }, 5000)
+        notify(`Added ${personObject.name}`)
         setNewName('')
         setNewNumber('')
       })
@@ -89,19 +58,12 @@ const App = () => {
         .update(changedPerson.id, changedPerson)
         .then(returnedPerson => {
           setPersons(persons.map(person => person.id !== changedPerson.id ? person : returnedPerson))
-          setMessage(`Updated ${person.name}'s number`)
-          setTimeout(() => {
-            setMessage(null)
-          }, 5000)
+          notify(`Updated ${person.name}'s number`)
           setNewName('')
           setNewNumber('')
         })
         .catch(error => {
-          setMessage(`Information of ${person.name} has already been removed from the server`)
-          setIsError(true)
-          setTimeout(() => {
-            setMessage(null)
-          }, 5000)
+          notify(`Information of ${person.name} has already been removed from the server`, 'alert')
           setPersons(persons.filter(p => p.id !== person.id))
         })
       }
@@ -113,15 +75,10 @@ const App = () => {
         .deletePerson(id)
         .then(()=> {
           setPersons(persons.filter(p => p.id !== id))
-          setMessage(`Deleted ${name}`)
-          setTimeout(() => {
-            setMessage(null)
-          }, 5000)
+          notify(`Deleted ${name}`)
         })
     }
   }
-
-  console.log("Phonebook: ", persons)
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
@@ -140,7 +97,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} isError={isError} />
+      <Notification notification={notification} />
       <Filter filters={filters} handleFilters={handleFilters} />
       <h2>Add a new</h2>
       <PersonForm 
