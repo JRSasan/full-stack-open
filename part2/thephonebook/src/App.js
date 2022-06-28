@@ -44,6 +44,9 @@ const App = () => {
         setNewName('')
         setNewNumber('')
       })
+      .catch(error => {
+        notify(error.response.data.error, 'alert')
+      })
   }
 
   const updatePerson = (event) => {
